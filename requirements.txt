@@ -1,0 +1,7 @@
+torch 
+torchvision 
+torchaudio
+torch --index-url https://download.pytorch.org/whl/cpu
+numpy 
+pandas 
+matplotlib
