@@ -1,0 +1,7 @@
+version: "1"
+services:
+  app: 
+    image: "python3"
+    build:
+      context: .
+      dockerfile: Dockerfile
