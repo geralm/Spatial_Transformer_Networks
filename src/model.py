@@ -9,7 +9,7 @@ import numpy as np
 
 plt.ion()   # interactive mode
 class Net(nn.Module):
-    def __init__(self, channels:int=3, img_size:int=512, feature_scale:int=4, batch_size:int=32):
+    def __init__(self, channels:int=3, img_size:int=512, feature_scale:int=4, batch_size:int=8):
         super(Net, self).__init__()
         # channels: RGB = 3
         self.channels:int=channels 
@@ -17,29 +17,29 @@ class Net(nn.Module):
         self.batch_size:int=batch_size
         filters = [64, 128, 256, 512, 1024]
         self.filters = [int(x / feature_scale) for x in filters]
-
+        print(f"Filters: {self.filters}")
         self.conv1 = nn.Conv2d(self.channels, self.filters[0], kernel_size=5)
         self.conv2 = nn.Conv2d( self.filters[0], self.filters[1], kernel_size=5)
         self.conv2_drop = nn.Dropout2d()
 
-        self.fc1 = nn.Linear(32*253*253, 50)
+        self.fc1 = nn.Linear(self.batch_size*253*253, 50)
         self.fc2 = nn.Linear(50, 19)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
-            nn.Conv2d(self.channels, self.filters[0], kernel_size=7),
+            nn.Conv2d(self.channels, self.filters[0], kernel_size=3),
             nn.MaxPool2d(2, stride=2),
             nn.ReLU(True),
-            nn.Conv2d(self.filters[0], self.filters[1], kernel_size=5),
+            nn.Conv2d(self.filters[0], self.filters[1], kernel_size=3),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.ReLU(True)
         )
 
         # Regressor for the 3 * 2 affine matrix
         self.fc_loc = nn.Sequential(
-            nn.Linear(32*252*252, self.filters[2]), 
+            nn.Linear(32*254*254, self.filters[1]), 
             nn.ReLU(True),
-            nn.Linear(self.filters[2], 3 * 2)
+            nn.Linear(self.filters[1], 3 * 2)
         )
 
         # Initialize the weights/bias with identity transformation
@@ -49,18 +49,18 @@ class Net(nn.Module):
 
     # Spatial transformer network forward function
     def stn(self, x):
-        print(x.size())
+        # print(x.size())
         xs = self.localization(x)
-        print(f"XS before  view {xs.size()}")
-        batch_size = x.size(0)
+        # print(f"XS before  view {xs.size()}")
+
         features = xs.size(1) * xs.size(2) * xs.size(3)
-        xs = xs.view(batch_size, features)
-        print(f"XS after  view {xs.size()}")
+        xs = xs.view(self.batch_size, features)
+        # print(f"XS after  view {xs.size()}")
         theta = self.fc_loc(xs)
 
-        print(f"Theta before  view {theta.size()}")
+        # print(f"Theta before  view {theta.size()}")
         theta = theta.view(-1, 2, 3)
-        print(f"Theta after  view {theta.size()} vs {x.size()}")
+        # print(f"Theta after  view {theta.size()} vs {x.size()}")
         grid = F.affine_grid(theta, x.size(), align_corners=False)
         x = F.grid_sample(x, grid,align_corners=False)
 
@@ -71,14 +71,15 @@ class Net(nn.Module):
         x = self.stn(x)
 
         # Perform the usual forward pass
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        print(f"Forward {x.size()}")
-        x = x.view(x.size(0),32*253*253) 
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
-        x = self.fc2(x)
-        return F.log_softmax(x, dim=1)
+        # x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        # x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        # print(f"Forward {x.size()}")
+        # x = x.view(x.size(0),32*253*253) 
+        # x = F.relu(self.fc1(x))
+        # x = F.dropout(x, training=self.training)
+        # x = self.fc2(x)
+        # return 
+        return x 
     def build(self, device):
         return self.to(device)
 
@@ -91,7 +92,7 @@ def train(device, train_loader, epoch, model, optimizer):
         output = model(data)
         # loss = F.nll_loss(output, target)
         # loss.backward()
-        # optimizer.step()
+        optimizer.step()
         if batch_idx % 500 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
@@ -158,9 +159,9 @@ def run(device, train_data, test_data):
     model = Net().build(device)
     optimizer = optim.SGD(model.parameters(), lr=0.01)
     print(f"Training on {device}")
-    for epoch in range(1, 3 + 1):
-        train(device, train_data, epoch, model, optimizer)
-        test(model, device, test_data)
+    # for epoch in range(1, 3 + 1):
+    #     train(device, train_data, epoch, model, optimizer)
+    #     test(model, device, test_data)
     # Visualize the STN transformation on some input batch
     visualize_stn(test_data, model, device)
 

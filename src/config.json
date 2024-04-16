@@ -1,0 +1,24 @@
+{
+    "data_loader": {
+        "path":"./celeba",
+        "dir_name":"CelebAMask-HQ/CelebAMask-HQ",
+        "zipname": "CelebAMask-HQ.zip",
+        "train": {
+            "path": "./src/Data_preprocessing/train_img",
+            "label":"./src/Data_preprocessing/train_label",
+            "batch_size": 8,
+            "num_workers": 4
+        },
+        "test":{
+            "path": "./src/Data_preprocessing/test_img",
+            "label": "./src/Data_preprocessing/test_label",
+            "batch_size":8,
+            "num_workers": 4
+        },
+        "img_size": 1024
+    },
+    
+    "model":{
+        "save_name": "celeba_mask.pth"
+    }
+}
