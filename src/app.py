@@ -6,32 +6,27 @@ import torchvision
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
-from dataloader import Data_Loader
+from preprocessing import *
+import preprocessing as prep
 from utils import *
 from model import *
+import pandas as pd
 
-def main(config:dict):     
-    #extract_data()
-    #move_to_preprocessing()
-    train_path = config["data_loader"]["train"]["path"]
-    train_label = config["data_loader"]["train"]["label"]
-    train_batch = config["data_loader"]["train"]["batch_size"]
+def main(config:dict):  
+    prep.preprocess(config)
+    
+    data_loader = prep.Data_Loader(config)
+    train_loader = data_loader.train_loader()
+    valid_loader = data_loader.valid_loader()
+    test_loader = data_loader.test_loader()
 
-    test_path = config["data_loader"]["test"]["path"]
-    test_batch = config["data_loader"]["test"]["batch_size"]
-    test_label = config["data_loader"]["test"]["label"]
-    img_size = config["data_loader"]["img_size"]
-    numworkers = 4
-
-    train = Data_Loader(train_path, train_label, img_size,
-                             train_batch, True, numworkers).loader()
-    test = Data_Loader(test_path, test_label, img_size,
-                    test_batch, numworkers, False).loader()
+   
+    
     print("Data loaded")
-    print(f"Train: {train}")
-    print(f"Test: {test}")
+    print(f"Train: {train_loader}")
+    print(f"Test: {valid_loader}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    run(device, train, test)
+    #run(device, train, test)
 if __name__ == "__main__":
     show_info()
     config= load_config() # Open the configuration file

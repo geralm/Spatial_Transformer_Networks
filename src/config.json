@@ -1,24 +1,25 @@
 {
-    "data_loader": {
-        "path":"./celeba",
-        "dir_name":"CelebAMask-HQ/CelebAMask-HQ",
-        "zipname": "CelebAMask-HQ.zip",
-        "train": {
-            "path": "./src/Data_preprocessing/train_img",
-            "label":"./src/Data_preprocessing/train_label",
-            "batch_size": 8,
-            "num_workers": 4
-        },
-        "test":{
-            "path": "./src/Data_preprocessing/test_img",
-            "label": "./src/Data_preprocessing/test_label",
-            "batch_size":8,
-            "num_workers": 4
-        },
-        "img_size": 1024
+    "data": {
+        "IMG_DIR": "./celeba/img_align_celeba/",
+        "ZIPNAME": "./celeba/img_align_celeba.zip",
+        "ATTR_FILE": "./celeba/list_attr_celeba.txt",
+        "PARTITION_FILE":"./celeba/list_eval_partition.txt" ,
+        "TO_CSV": "./celeba/celeba-gender-partitions.csv",
+        "TRAIN_FILE": "./celeba/celeba-gender-train.csv",
+        "VAL_FILE": "./celeba/celeba-gender-valid.csv",
+        "TEST_FILE": "./celeba/celeba-gender-test.csv",
+        "NUM_WORKERS": 4,
+        "IMG_SIZE": 128 ,
+        "BATCH_SIZE":8
+        
     },
-    
     "model":{
-        "save_name": "celeba_mask.pth"
+        "RANDOM_SEED": 1,
+        "LEARNING_RATE": 0.001,
+        "NUM_EPOCHS": 10,
+        "NUM_FEATURES": 128, 
+        "NUM_CLASSES": 2,
+        "BATCH_SIZE":8,
+        "CHANNELS":3
     }
 }
