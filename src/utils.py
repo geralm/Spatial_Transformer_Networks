@@ -1,9 +1,6 @@
 import torch
 import numpy as np
 import json
-import zipfile
-import shutil
-import os
 from pathlib import Path
 def show_info():
     print("Versión de NumPy:", np.__version__)
@@ -27,3 +24,11 @@ def load_config()->dict:
     # a dictionary
     data = json.load(f)
     return data
+def convert_image_np(inp):
+    """Convert a Tensor to numpy image."""
+    inp = inp.numpy().transpose((1, 2, 0))
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    inp = std * inp + mean
+    inp = np.clip(inp, 0, 1)
+    return inp

@@ -97,12 +97,12 @@ class Data_Loader(utils_data.DataLoader):
     def valid_loader(self):
         return utils_data.DataLoader(dataset=self._valid_dataset(),
                                      batch_size=self.batch,
-                                     shuffle=True,
+                                     shuffle=False,
                                      num_workers=self.num_workers)
     def test_loader(self):
         return utils_data.DataLoader(dataset=self._test_dataset(),
                                      batch_size=self.batch,
-                                     shuffle=True,
+                                     shuffle=False,
                                      num_workers=self.num_workers)
 def preprocess(config):
     """
