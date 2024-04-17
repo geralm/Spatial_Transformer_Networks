@@ -15,17 +15,17 @@
     },
     "model":{
         "TRAIN": false,
+        "TEST":true,
         "RANDOM_SEED": 1,
         "LEARNING_RATE": 0.001,
-        "NUM_EPOCHS": 3,
+        "NUM_EPOCHS": 5,
         "NUM_FEATURES": 128, 
         "NUM_CLASSES": 2,
         "BATCH_SIZE":8,
         "CHANNELS":3,
         "LAYERS": [3, 4, 23, 3],
         "SAVE_MODEL_PATH": "./celeba/model.pth",
-        "SAVE":true,
-        "LOAD_MODEL": true
+        "AUTO_SAVE":false
     }
     
 }

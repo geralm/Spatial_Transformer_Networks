@@ -34,6 +34,9 @@ def split(to_csv_path:str,
           valid_csv, 
           test_csv ,  
           df1, df2):
+    """
+    Split the data into train, validation and test
+    """
     df3 = df1.merge(df2, left_index=True, right_index=True)
     df3.to_csv(to_csv_path)
     df4 = pd.read_csv(to_csv_path, index_col=0)
