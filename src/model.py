@@ -250,10 +250,14 @@ def run(train_loader, test_loader, val_loader, config):
         print('Time elapsed: %.2f min' % ((time.time() - start_time)/60))    
     with torch.no_grad(): # save memory during inference
         print('Test accuracy: %.2f%%' % (compute_accuracy(model, test_loader, device=DEVICE)))
-    random_test(model, test_loader, DEVICE)
-    visualize_stn(test_loader, model, DEVICE)
     print('Total Training Time: %.2f min' % ((time.time() - start_time)/60))
-    plt.ioff()
-    plt.show()
+    return model, DEVICE
+def load_model(config, device):
+    model = build(config)
+    model = model.to(device)
+    model.load_state_dict(torch.load(config["model"]["SAVE_MODEL_PATH"]))
+    return model
+    
+
 
 

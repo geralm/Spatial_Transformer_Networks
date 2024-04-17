@@ -32,3 +32,7 @@ def convert_image_np(inp):
     inp = std * inp + mean
     inp = np.clip(inp, 0, 1)
     return inp
+def save_model(model, path):
+    torch.save(model.state_dict(), path)
+    print("Model saved!")
+
