@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import json
-from pathlib import Path
 def show_info():
     print("Versión de NumPy:", np.__version__)
     print("Versión de PyTorch:", torch.__version__)
@@ -24,15 +23,32 @@ def load_config()->dict:
     # a dictionary
     data = json.load(f)
     return data
-def convert_image_np(inp):
-    """Convert a Tensor to numpy image."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    return inp
-def save_model(model, path):
-    torch.save(model.state_dict(), path)
-    print("Model saved!")
 
+def compute_accuracy(model, data_loader, device):
+    correct_pred, num_examples = 0, 0
+    for i, (features, targets) in enumerate(data_loader):
+            
+        features = features.to(device)
+        targets = targets.to(device)
+
+        logits, probas = model(features)
+        _, predicted_labels = torch.max(probas, 1)
+        num_examples += targets.size(0)
+        correct_pred += (predicted_labels == targets).sum()
+    return correct_pred.float()/num_examples * 100    
+def save_menu() -> bool:
+    should_Save: bool = True
+    print("***************************************")
+    print("*    Training finished successfully   *")
+    print("***************************************")
+    entry = input("Do you want to save this model? [y/n]: ")
+    while True:
+        if entry.lower() == "y":
+            should_Save = True
+            break
+        elif entry.lower() == "n":
+            should_Save = False
+            break
+        else:
+            entry = input("Invalid input. Please enter 'y' or 'n': ")
+    return should_Save
