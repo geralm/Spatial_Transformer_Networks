@@ -10,12 +10,12 @@
         "TEST_FILE": "./celeba/celeba-gender-test.csv",
         "NUM_WORKERS": 4,
         "IMG_SIZE": 128 ,
-        "BATCH_SIZE":64
-        
+        "BATCH_SIZE":64,
+        "TEST_IMAGE": "./celeba/img_align_celeba/000547.jpg"
     },
     "model":{
         "TRAIN": false,
-        "TEST":true,       
+        "TEST":false,       
         "RANDOM_SEED": 1,
         "LEARNING_RATE": 0.001,
         "NUM_EPOCHS": 5,
@@ -24,7 +24,7 @@
         "BATCH_SIZE":64,
         "CHANNELS":3,
         "LAYERS": [3, 4, 23, 3],
-        "SAVE_MODEL_PATH": "./celeba/model.pth",
+        "SAVE_MODEL_PATH": "./celeba/stnmodel.pth",
         "AUTO_SAVE":false
     }
     

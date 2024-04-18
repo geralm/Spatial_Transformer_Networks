@@ -2,9 +2,11 @@
 import pandas as pd
 import zipfile
 import os
+import numpy as np
 import torch.utils.data as utils_data
 from PIL import Image
 from torchvision import datasets, transforms
+import matplotlib.pyplot as plt
 def extract_data(zip_path):
     """
     Call this function to extract Celeba
@@ -65,6 +67,19 @@ class CelebaDataset(utils_data.Dataset):
 
     def __len__(self):
         return self.y.shape[0]
+def show_image(path:str)->None:
+        """
+        Show an image
+        """
+        try:
+            img = Image.open(path)
+            print(np.asarray(img, dtype=np.uint8).shape)
+            plt.imshow(img)
+            plt.show()
+        except:
+            print("Could not open the image")
+            return -1 
+        return 0  
 class Data_Loader(utils_data.DataLoader):
     def __init__(self, settings:dict):
         self.train_file = settings["data"]["TRAIN_FILE"] 
@@ -107,6 +122,8 @@ class Data_Loader(utils_data.DataLoader):
                                      batch_size=self.batch,
                                      shuffle=False,
                                      num_workers=self.num_workers)
+
+
 def preprocess(config):
     """
     This function runs the preprocessing steps
