@@ -53,7 +53,7 @@ def main(config:dict):
             model.load_state_dict(torch.load(saveModelPath))
             print("Model loaded sucessfully")
         except:
-            print(f"You need a pretreined model: Model not found in the directory {saveModelPath}")
+            print(f"You need a pretreined model: Model not found in the directory {saveModelPath} or the model class has changed")
             return -1        
     is_testing = config["model"]["TEST"]
     if is_testing:

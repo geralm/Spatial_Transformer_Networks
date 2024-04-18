@@ -72,19 +72,22 @@ class Net(nn.Module):
                 m.bias.data.zero_()
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
-            nn.Conv2d(in_dim, 64, kernel_size=7),
+            nn.Conv2d(in_dim, 64, kernel_size=7, padding=3),
             nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-            nn.Conv2d(64, 16, kernel_size=5),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.ReLU(True)
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 128, kernel_size=5, padding=2),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(inplace=True)
         )
 
         # Regressor for the 3 * 2 affine matrix
         self.fc_loc = nn.Sequential(
-            nn.Linear(16*28*28, 32), 
+            nn.Linear(128*16*16, 256), 
             nn.ReLU(True),
-            nn.Linear(32, 3 * 2)
+            nn.Linear(256, 3 * 2)
         )
 
         # Initialize the weights/bias with identity transformation
@@ -96,7 +99,7 @@ class Net(nn.Module):
     def stn(self, x):
         xs = self.localization(x)
         batch_size = x.size(0)
-        xs = xs.view(batch_size, -1)  
+        xs = xs.view(-1, 128*16*16)  
         theta = self.fc_loc(xs)
 
         # print(f"Theta before  view {theta.size()}")
@@ -154,98 +157,3 @@ def build_model(config:dict):
                    num_classes=NUM_CLASSES,
                    channels=CHANNELS)
     return model
-# def train(device, train_loader, epoch, model, optimizer, total_epochs):
-#     model.train()
-#     cost_fn = torch.nn.CrossEntropyLoss() 
-#     for batch_idx, (features, targets) in enumerate(train_loader):
-#         features, targets = features.to(device), targets.to(device)       
-#             ### FORWARD AND BACK PROP
-#         logits, probas = model(features)
-#         cost = cost_fn(logits, targets)
-#         optimizer.zero_grad()     
-#         cost.backward()
-#         ### UPDATE MODEL PARAMETERS
-#         optimizer.step()
-#         ### LOGGING
-#         if not batch_idx % 50:
-#             print ('Epoch: %03d/%03d | Batch %04d/%04d | Cost: %.4f' 
-#                 %(epoch+1,total_epochs , batch_idx, 
-#                     len(train_loader), cost))
-# def compute_accuracy(model, data_loader, device):
-#     correct_pred, num_examples = 0, 0
-#     for i, (features, targets) in enumerate(data_loader):
-            
-#         features = features.to(device)
-#         targets = targets.to(device)
-
-#         logits, probas = model(features)
-#         _, predicted_labels = torch.max(probas, 1)
-#         num_examples += targets.size(0)
-#         correct_pred += (predicted_labels == targets).sum()
-#     return correct_pred.float()/num_examples * 100
-
-# def test(device, model,train_loader, valid_loader, epoch, total_epochs):
-#     with torch.no_grad(): # save memory during inference
-#         model.eval()        
-#         print('Epoch: %03d/%03d | Train: %.3f%% | Valid: %.3f%%' % (
-#             epoch+1, total_epochs, 
-#             compute_accuracy(model, train_loader, device=device),
-#             compute_accuracy(model, valid_loader, device=device)))
-# # We want to visualize the output of the spatial transformers layer
-# # after the training, we visualize a batch of input images and
-# # the corresponding transformed batch using STN.
-
-
-# def visualize_stn(test_loader, model, device):
-#     with torch.no_grad():
-#         # Get a batch of training data
-#         data = next(iter(test_loader))[0].to(device)
-
-#         input_tensor = data.cpu()
-#         transformed_input_tensor = model.stn(data).cpu()
-
-#         in_grid = convert_image_np(
-#             torchvision.utils.make_grid(input_tensor))
-
-#         out_grid = convert_image_np(
-#             torchvision.utils.make_grid(transformed_input_tensor))
-
-#         # Plot the results side-by-side
-#         f, axarr = plt.subplots(1, 2)
-#         axarr[0].imshow(in_grid)
-#         axarr[0].set_title('Dataset Images')
-
-#         axarr[1].imshow(out_grid)
-#         axarr[1].set_title('Transformed Images')
-# def random_test(model, test_loader, device):
-#     for batch_idx, (features, targets) in enumerate(test_loader):
-#         features = features
-#         targets = targets
-#         break
-#     model.eval()
-#     logits, probas = model(features.to(device)[0, None])
-#     print('Probability Female %.2f%%' % (probas[0][0]*100))
-    
-# def run(train_loader, test_loader, val_loader, config):
-#     SEED = config["model"]["RANDOM_SEED"]
-#     LEARNING_RATE = config["model"]["LEARNING_RATE"]
-#     NUM_EPOCHS = config["model"]["NUM_EPOCHS"]
-#     torch.manual_seed(SEED)
-#     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#     print(f"Building model and moving to {DEVICE}")
-#     model = build(config)
-#     model = model.to(DEVICE)
-#     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)  
-#     start_time = time.time()
-#     for epoch in range(NUM_EPOCHS):
-#         train(DEVICE, train_loader, epoch, model, optimizer, NUM_EPOCHS)
-#         test(DEVICE, model, train_loader, val_loader, epoch, NUM_EPOCHS)
-#         print('Time elapsed: %.2f min' % ((time.time() - start_time)/60))    
-#     with torch.no_grad(): # save memory during inference
-#         print('Test accuracy: %.2f%%' % (compute_accuracy(model, test_loader, device=DEVICE)))
-#     print('Total Training Time: %.2f min' % ((time.time() - start_time)/60))
-#     return model, DEVICE
-
-
-
-
