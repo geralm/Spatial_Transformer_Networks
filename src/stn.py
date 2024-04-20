@@ -8,6 +8,7 @@ class STN(nn.Module):
     def __init__(self, channels):
         super(STN, self).__init__()
         in_dim = channels
+        self.fc2 = nn.Linear(3*128*128, 2)
          # Spatial transformer localization-network
         self.localization = nn.Sequential(
             nn.Conv2d(in_dim, 64, kernel_size=7, padding=3),
@@ -35,19 +36,20 @@ class STN(nn.Module):
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        batch_size = x.size(0)
         xs = xs.view(-1, 128*16*16)  
         theta = self.fc_loc(xs)
 
-        # print(f"Theta before  view {theta.size()}")
-        theta = theta.view(-1, 2, 3)
-        # print(f"Theta after  view {theta.size()} vs {x.size()}")
-        grid = F.affine_grid(theta, x.size(),align_corners=True)
-        x = F.grid_sample(x, grid,align_corners=True)
 
+        theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
+        grid = F.affine_grid(theta, x.size(),align_corners=False)
+        x = F.grid_sample(x, grid,align_corners=False)
         return x
     def forward(self, x):
-        return self.stn(x)
+        x = self.stn(x)
+        x = x.view(-1, 3*128*128)
+        logits  = self.fc2(x)
+        probas = F.softmax(logits, dim=1)
+        return logits, probas
 def build_model(config:dict):
     channels = config["model"]["CHANNELS"]
     return STN(channels)

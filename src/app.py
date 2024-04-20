@@ -20,7 +20,7 @@ def main(config:dict):
     train = data_loader.train_loader()
     valid = data_loader.valid_loader()
     test = data_loader.test_loader()
-    prep.show_image(config["data"]["TEST_IMAGE"])
+    #prep.show_image(config["data"]["TEST_IMAGE"])
     # Load the model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #model = model.build_model(config).to(device)
@@ -52,14 +52,11 @@ def main(config:dict):
                 torch.save(model.state_dict(), saveModelPath)
                 print("Model saved!")
     elif is_testing:
-        # Load the model if it is not going to be trained
-        # but you should have pretrained one
-        
         try:
             model.load_state_dict(torch.load(saveModelPath))
             print("Model loaded sucessfully")
         except:
-            print(f"You need a pretreined model: Model not found in the directory {saveModelPath} or the model class has changed")
+            print(f"Model not found You need a pretreined model: Model not found in the directory {saveModelPath} or the model class has changed")
             return -1        
     if is_testing:
         #tester.run()

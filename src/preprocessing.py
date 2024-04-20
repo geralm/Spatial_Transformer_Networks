@@ -93,7 +93,8 @@ class Data_Loader(utils_data.DataLoader):
                                        #transforms.Grayscale(),                                       
                                        #transforms.Lambda(lambda x: x/255.),
                                        transforms.ToTensor()])
-
+        # Note that transforms.ToTensor()
+        # already divides pixels by 255. internally
 
     def _train_dataset(self):
         return CelebaDataset(csv_path=self.train_file,

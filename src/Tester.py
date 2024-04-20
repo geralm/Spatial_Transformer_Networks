@@ -16,15 +16,16 @@ class Tester():
         self.model.eval()
         logits, probas = self.model(features.to(self.device)[0, None])
         print('Probability Female %.2f%%' % (probas[0][0]*100))
-    def _convert_image_np(self,inp):
-        """Convert a Tensor to numpy image."""
+    def _convert_image_np(self, inp):
+        """Convert the image to np."""
         inp = inp.numpy().transpose((1, 2, 0))
-        mean = np.array([0.485, 0.456, 0.406])
-        std = np.array([0.229, 0.224, 0.225])
-        inp = std * inp + mean
+        mean_rgb = np.array([0.5, 0.5, 0.5])
+        std_rgb = np.array([0.5, 0.5, 0.5])
+        inp = std_rgb * inp + mean_rgb
         inp = np.clip(inp, 0, 1)
         return inp
     def visualize_stn(self):
+        self.model.eval()
         plt.ion()
         with torch.no_grad():
         # Get a batch of training data
@@ -32,12 +33,18 @@ class Tester():
 
             input_tensor = data.cpu()
             transformed_input_tensor = self.model.stn(data).cpu()
+            print("Transformed data shape:", transformed_input_tensor.shape)
+            print("Transformed data values:", transformed_input_tensor)
+
 
             in_grid = self._convert_image_np(
                 torchvision.utils.make_grid(input_tensor))
 
             out_grid = self._convert_image_np(
                 torchvision.utils.make_grid(transformed_input_tensor))
+            
+            print("Input images shape:", in_grid.shape)
+            print("Output images shape:", out_grid.shape)
 
             # Plot the results side-by-side
             f, axarr = plt.subplots(1, 2)
