@@ -41,8 +41,8 @@ class STN(nn.Module):
 
 
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
-        grid = F.affine_grid(theta, x.size(),align_corners=False)
-        x = F.grid_sample(x, grid,align_corners=False)
+        grid = F.affine_grid(theta, x.size())
+        x = F.grid_sample(x, grid)
         return x
     def forward(self, x):
         x = self.stn(x)
