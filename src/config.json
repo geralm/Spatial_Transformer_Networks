@@ -14,7 +14,7 @@
         "TEST_IMAGE": "./celeba/img_align_celeba/000547.jpg"
     },
     "model":{
-        "TRAIN": false,
+        "TRAIN": true,
         "TEST":true,       
         "RANDOM_SEED": 1,
         "LEARNING_RATE": 0.001,
@@ -24,7 +24,7 @@
         "BATCH_SIZE":64,
         "CHANNELS":3,
         "LAYERS": [3, 4, 23, 3],
-        "SAVE_MODEL_PATH": "./celeba/stnmodel.pth",
+        "SAVE_MODEL_PATH": "./celeba/stnmodel_lite.pth",
         "AUTO_SAVE":false
     }
     

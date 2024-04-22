@@ -33,6 +33,8 @@ class Tester():
 
             input_tensor = data.cpu()
             transformed_input_tensor = self.model.stn(data).cpu()
+            print("Input tensor shape",input_tensor.shape )
+            print("Input tensor data",input_tensor )
             print("Transformed data shape:", transformed_input_tensor.shape)
             print("Transformed data values:", transformed_input_tensor)
 
