@@ -90,9 +90,8 @@ class Data_Loader(utils_data.DataLoader):
         self.num_workers = settings["data"]["NUM_WORKERS"]
         self.custom_transform = transforms.Compose([transforms.CenterCrop((178, 178)),
                                        transforms.Resize((128, 128)),
-                                       #transforms.Grayscale(),                                       
-                                       #transforms.Lambda(lambda x: x/255.),
-                                       transforms.ToTensor()])
+                                       transforms.ToTensor(),
+                                       transforms.Normalize((0.4914, 0.4822, 0.4465), (0.5, 0.5, 0.5))])
         # Note that transforms.ToTensor()
         # already divides pixels by 255. internally
 

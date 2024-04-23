@@ -9,25 +9,6 @@ class STN(nn.Module):
         super(STN, self).__init__()
         in_dim = channels
         self.fc2 = nn.Linear(3*128*128, 2)
-         # Spatial transformer localization-network
-        # self.localization = nn.Sequential(
-        #     nn.Conv2d(in_dim, 64, kernel_size=7, padding=3),
-        #     nn.MaxPool2d(2, stride=2),
-        #     nn.ReLU(inplace=True),
-        #     nn.Conv2d(64, 128, kernel_size=5, padding=2),
-        #     nn.MaxPool2d(2, stride=2),
-        #     nn.ReLU(inplace=True),
-        #     nn.Conv2d(128, 128, kernel_size=3, padding=1),
-        #     nn.MaxPool2d(2, stride=2),
-        #     nn.ReLU(inplace=True)
-        # )
-        # # Regressor for the 3 * 2 affine matrix
-        # self.fc_loc = nn.Sequential(
-        #     nn.Linear(128*16*16, 256), 
-        #     nn.ReLU(True),
-        #     nn.Linear(256, 3 * 2)
-        # )
-
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
             nn.Conv2d(in_dim, 8, kernel_size=7),
@@ -37,22 +18,22 @@ class STN(nn.Module):
             nn.MaxPool2d(2, stride=2),
             nn.ReLU(True)
         )
-
         # Regressor for the 3 * 2 affine matrix
         self.fc_loc = nn.Sequential(
-            nn.Linear(10 * 3 * 3, 32),
+            nn.Linear(10 * 28 * 28, 32),
             nn.ReLU(True),
             nn.Linear(32, 3 * 2)
         )
         # Initialize the weights/bias with identity transformation
         self.fc_loc[2].weight.data.zero_() 
-        self.fc_loc[2].bias.data.copy_(torch.tensor([1, 0, 0, 0, 1, 0] , dtype=torch.float))
+        self.fc_loc[2].bias.data.copy_(
+            torch.tensor([1, 0, 0, 0, 1, 0] , dtype=torch.float)
+            )
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        print(f"{xs.size()}")
-        xs = xs.view(-1, 128*16*16)  
-
+        xs = xs.view(-1,  10 * 28 * 28)  
+        # xs = F.normalize(xs, dim=-1)
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
         

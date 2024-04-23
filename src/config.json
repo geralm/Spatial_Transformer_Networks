@@ -14,7 +14,7 @@
         "TEST_IMAGE": "./celeba/img_align_celeba/000547.jpg"
     },
     "model":{
-        "TRAIN": true,
+        "TRAIN": false,
         "TEST":true,       
         "RANDOM_SEED": 1,
         "LEARNING_RATE": 0.001,
