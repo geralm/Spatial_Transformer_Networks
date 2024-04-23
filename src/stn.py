@@ -37,9 +37,9 @@ class STN(nn.Module):
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
         
-        grid = F.affine_grid(theta, x.size(), align_corners=True)
+        grid = F.affine_grid(theta, x.size(), align_corners=False)
         #,mode="bilinear", padding_mode="border",
-        x = F.grid_sample(x, grid, align_corners=True)
+        x = F.grid_sample(x, grid, align_corners=False)
         return x
     def forward(self, x):
         x = self.stn(x)
