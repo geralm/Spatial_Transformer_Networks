@@ -33,21 +33,13 @@ class Tester():
 
             input_tensor = data.cpu()
             transformed_input_tensor = self.model.stn(data).cpu()
-            print("Input tensor shape",input_tensor.shape )
-            print("Input tensor data",input_tensor )
-            print("Transformed data shape:", transformed_input_tensor.shape)
-            print("Transformed data values:", transformed_input_tensor)
-
-
+         
             in_grid = self._convert_image_np(
                 torchvision.utils.make_grid(input_tensor))
 
             out_grid = self._convert_image_np(
                 torchvision.utils.make_grid(transformed_input_tensor))
             
-            print("Input images shape:", in_grid.shape)
-            print("Output images shape:", out_grid.shape)
-
             # Plot the results side-by-side
             f, axarr = plt.subplots(1, 2)
             axarr[0].imshow(in_grid)

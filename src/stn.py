@@ -11,28 +11,31 @@ class STN(nn.Module):
         self.fc2 = nn.Linear(3*128*128, 2)
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
-            nn.Conv2d(in_dim, 8, kernel_size=7),
+            nn.Conv2d(in_dim, 32, kernel_size=7),
             nn.MaxPool2d(2, stride=2),
             nn.ReLU(True),
-            nn.Conv2d(8, 10, kernel_size=5),
+            nn.Conv2d(32, 32, kernel_size=5),
             nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),
+            nn.Conv2d(32, 10, kernel_size=5),
             nn.ReLU(True)
         )
         # Regressor for the 3 * 2 affine matrix
         self.fc_loc = nn.Sequential(
-            nn.Linear(10 * 28 * 28, 32),
+            nn.Linear(10 * 24 * 24, 32),
             nn.ReLU(True),
-            nn.Linear(32, 3 * 2)
+            nn.Dropout(p=0.5),
+            nn.Linear(32, 3 * 2),
         )
         # Initialize the weights/bias with identity transformation
-        self.fc_loc[2].weight.data.zero_() 
-        self.fc_loc[2].bias.data.copy_(
+        self.fc_loc[-1].weight.data.zero_() 
+        self.fc_loc[-1].bias.data.copy_(
             torch.tensor([1, 0, 0, 0, 1, 0] , dtype=torch.float)
             )
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        xs = xs.view(-1,  10 * 28 * 28)  
+        xs = xs.view(-1,  10 * 24 * 24)  
         # xs = F.normalize(xs, dim=-1)
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
