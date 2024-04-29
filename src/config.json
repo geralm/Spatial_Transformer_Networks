@@ -26,7 +26,7 @@
         "LAYERS": [3, 4, 23, 3],
         "SAVE_MODEL_PATH": "./celeba/stnmodelv8.pth",
         "AUTO_SAVE":true,
-        "ONCUDA": false
+        "ONCUDA": true
     }
     
 }
