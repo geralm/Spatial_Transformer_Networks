@@ -2,7 +2,7 @@ import torch
 from preprocessing import *
 import preprocessing as prep
 from utils import *
-import model as model 
+import model as resnet 
 import stn as stn
 from Tester import * 
 from Trainer import *
@@ -10,7 +10,7 @@ from Trainer import *
 def main(config:dict):  
     saveModelPath:str = config["model"]["SAVE_MODEL_PATH"]
     autoSave:bool = config["model"]["AUTO_SAVE"]
-
+    oncuda:bool = config["model"]["ONCUDA"]
     show_info()
     # Preprocess the data 
     prep.preprocess(config)
@@ -20,10 +20,14 @@ def main(config:dict):
     train = data_loader.train_loader()
     valid = data_loader.valid_loader()
     test = data_loader.test_loader()
-    #prep.show_image(config["data"]["TEST_IMAGE"])
+    # prep.show_image(config["data"]["TEST_IMAGE"])
     # Load the model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #model = model.build_model(config).to(device)
+    if oncuda and torch.cuda.is_available():
+        device_name = "cuda"
+    else:
+        device_name = "cpu"
+    device = torch.device(device_name)
+    #model = resnet.build_model(config).to(device)
     model = stn.build_model(config).to(device)
     #Trainer object
     trainer  = Trainer(

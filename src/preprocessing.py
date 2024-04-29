@@ -88,8 +88,9 @@ class Data_Loader(utils_data.DataLoader):
         self.img_dir = settings["data"]["IMG_DIR"]
         self.batch = settings["data"]["BATCH_SIZE"]
         self.num_workers = settings["data"]["NUM_WORKERS"]
+        self.img_size = settings["data"]["IMG_SIZE"]
         self.custom_transform = transforms.Compose([transforms.CenterCrop((178, 178)),
-                                       transforms.Resize((128, 128)),
+                                       transforms.Resize((self.img_size, self.img_size)),
                                        transforms.ToTensor(),
                                        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.5, 0.5, 0.5))])
         # Note that transforms.ToTensor()
