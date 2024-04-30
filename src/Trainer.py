@@ -13,7 +13,8 @@ class Trainer():
         self.validation_loader = validation_loader
 
         self.model = model
-        self.optimizer =  torch.optim.Adam(model.parameters(), lr=self._LEARNING_RATE)  
+        self.optimizer = torch.optim.SGD(model.parameters(), lr=self._LEARNING_RATE) #torch.optim.Adam(model.parameters(), lr=self._LEARNING_RATE) 
+         
     def _trainfunc(self, epoch):
         self.model.train()
         cost_fn = torch.nn.CrossEntropyLoss()

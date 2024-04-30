@@ -9,7 +9,7 @@
         "VAL_FILE": "./celeba/celeba-gender-valid.csv",
         "TEST_FILE": "./celeba/celeba-gender-test.csv",
         "NUM_WORKERS": 4,
-        "IMG_SIZE": 128 ,
+        "IMG_SIZE": 64 ,
         "BATCH_SIZE":64,
         "TEST_IMAGE": "./celeba/img_align_celeba/000547.jpg"
     },
@@ -24,7 +24,7 @@
         "BATCH_SIZE":64,
         "CHANNELS":3,
         "LAYERS": [3, 4, 23, 3],
-        "SAVE_MODEL_PATH": "./celeba/stnmodelv8.pth",
+        "SAVE_MODEL_PATH": "./celeba/stnmodelv9.pth",
         "AUTO_SAVE":true,
         "ONCUDA": true
     }
