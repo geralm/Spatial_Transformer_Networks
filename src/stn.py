@@ -11,19 +11,27 @@ class STN(nn.Module):
         self._imsize = img_size
         self.fc2 = nn.Linear(3*self._imsize*self._imsize, 2)
         
-        self.localization = nn.Sequential(nn.Conv2d(in_dim, 64, kernel_size=7),
-                                          nn.BatchNorm2d(64),
-                                          nn.ReLU(True),
-                                          nn.Conv2d(64, 64*4, kernel_size=5),
-                                          nn.MaxPool2d(2, stride=2),
-                                          nn.ReLU(True),
-                                          nn.Conv2d(64*4, 128*4, kernel_size=5),
-                                          nn.MaxPool2d(2, stride=2),
-                                          nn.ReLU(True),
-                                            )
+        self.localization = nn.Sequential(
+            nn.Conv2d(in_dim, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),
+            #layer 1 64
+            nn.Conv2d(64, 64*4, kernel_size=3),
+            nn.BatchNorm2d(64*4),
+            nn.ReLU(True),
+            #layer 2 128
+            nn.Conv2d(256, 128*4, kernel_size=2),
+            nn.BatchNorm2d(128*4),
+            nn.ReLU(True),
+            #layer 3 256                                                    
+            nn.Conv2d(512, 512, kernel_size=5),
+            nn.BatchNorm2d(512),
+            nn.ReLU(True),
+            )
 
         self.fc_loc = nn.Sequential(
-                                    nn.Linear( 512*11*11, 512),
+                                    nn.Linear( 512*9*9, 512),
                                     nn.ReLU(True),
                                     nn.Linear(512 , 2*3)
                                     )
@@ -36,7 +44,7 @@ class STN(nn.Module):
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        xs = xs.view(-1,  512*11*11)  
+        xs = xs.view(-1,  512*9*9)  
         # xs = F.normalize(xs, dim=-1)
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
