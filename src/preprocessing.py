@@ -2,9 +2,11 @@
 import pandas as pd
 import zipfile
 import os
+import numpy as np
 import torch.utils.data as utils_data
 from PIL import Image
 from torchvision import datasets, transforms
+import matplotlib.pyplot as plt
 def extract_data(zip_path):
     """
     Call this function to extract Celeba
@@ -65,6 +67,19 @@ class CelebaDataset(utils_data.Dataset):
 
     def __len__(self):
         return self.y.shape[0]
+def show_image(path:str)->None:
+        """
+        Show an image
+        """
+        try:
+            img = Image.open(path)
+            print(np.asarray(img, dtype=np.uint8).shape)
+            plt.imshow(img)
+            plt.show()
+        except:
+            print("Could not open the image")
+            return -1 
+        return 0  
 class Data_Loader(utils_data.DataLoader):
     def __init__(self, settings:dict):
         self.train_file = settings["data"]["TRAIN_FILE"] 
@@ -73,12 +88,13 @@ class Data_Loader(utils_data.DataLoader):
         self.img_dir = settings["data"]["IMG_DIR"]
         self.batch = settings["data"]["BATCH_SIZE"]
         self.num_workers = settings["data"]["NUM_WORKERS"]
+        self.img_size = settings["data"]["IMG_SIZE"]
         self.custom_transform = transforms.Compose([transforms.CenterCrop((178, 178)),
-                                       transforms.Resize((128, 128)),
-                                       #transforms.Grayscale(),                                       
-                                       #transforms.Lambda(lambda x: x/255.),
-                                       transforms.ToTensor()])
-
+                                       transforms.Resize((self.img_size, self.img_size)),
+                                       transforms.ToTensor(),
+                                       transforms.Normalize((0.4914, 0.4822, 0.4465), (0.5, 0.5, 0.5))])
+        # Note that transforms.ToTensor()
+        # already divides pixels by 255. internally
 
     def _train_dataset(self):
         return CelebaDataset(csv_path=self.train_file,
@@ -107,6 +123,8 @@ class Data_Loader(utils_data.DataLoader):
                                      batch_size=self.batch,
                                      shuffle=False,
                                      num_workers=self.num_workers)
+
+
 def preprocess(config):
     """
     This function runs the preprocessing steps

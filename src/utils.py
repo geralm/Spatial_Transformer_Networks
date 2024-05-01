@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import json
+
 def show_info():
     print("Versión de NumPy:", np.__version__)
     print("Versión de PyTorch:", torch.__version__)

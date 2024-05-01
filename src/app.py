@@ -2,13 +2,15 @@ import torch
 from preprocessing import *
 import preprocessing as prep
 from utils import *
-from model import *
+import model as resnet 
+import stn as stn
 from Tester import * 
 from Trainer import *
 
 def main(config:dict):  
     saveModelPath:str = config["model"]["SAVE_MODEL_PATH"]
     autoSave:bool = config["model"]["AUTO_SAVE"]
+    oncuda:bool = config["model"]["ONCUDA"]
     show_info()
     # Preprocess the data 
     prep.preprocess(config)
@@ -18,9 +20,15 @@ def main(config:dict):
     train = data_loader.train_loader()
     valid = data_loader.valid_loader()
     test = data_loader.test_loader()
+    # prep.show_image(config["data"]["TEST_IMAGE"])
     # Load the model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = build_model(config).to(device)
+    if oncuda and torch.cuda.is_available():
+        device_name = "cuda"
+    else:
+        device_name = "cpu"
+    device = torch.device(device_name)
+    #model = resnet.build_model(config).to(device)
+    model = stn.build_model(config).to(device)
     #Trainer object
     trainer  = Trainer(
         train_loader=train,
@@ -36,6 +44,7 @@ def main(config:dict):
         )
 
     is_training= config["model"]["TRAIN"]
+    is_testing = config["model"]["TEST"]
     if is_training: # If the model is going to be trained, otherwise you need to have pretrained model
         print("Training the model...")
         model = trainer.run()
@@ -46,19 +55,16 @@ def main(config:dict):
             if save_menu():
                 torch.save(model.state_dict(), saveModelPath)
                 print("Model saved!")
-    else:
-        # Load the model if it is not going to be trained
-        # but you should have pretrained one
+    elif is_testing:
         try:
             model.load_state_dict(torch.load(saveModelPath))
             print("Model loaded sucessfully")
         except:
-            print(f"You need a pretreined model: Model not found in the directory {saveModelPath} or the model class has changed")
+            print(f"Model not found You need a pretreined model: Model not found in the directory {saveModelPath} or the model class has changed")
             return -1        
-    is_testing = config["model"]["TEST"]
     if is_testing:
-        tester.run()
-        tester.random_test()
+        #tester.run()
+        #tester.random_test()
         tester.visualize_stn()
 if __name__ == "__main__":
     config=load_config() # Open the configuration file
