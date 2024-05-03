@@ -10,7 +10,6 @@ from Trainer import *
 def main(config:dict):  
     saveModelPath:str = config["model"]["SAVE_MODEL_PATH"]
     autoSave:bool = config["model"]["AUTO_SAVE"]
-    oncuda:bool = config["model"]["ONCUDA"]
     show_info()
     # Preprocess the data 
     prep.preprocess(config)
@@ -22,11 +21,7 @@ def main(config:dict):
     test = data_loader.test_loader()
     # prep.show_image(config["data"]["TEST_IMAGE"])
     # Load the model
-    if oncuda and torch.cuda.is_available():
-        device_name = "cuda"
-    else:
-        device_name = "cpu"
-    device = torch.device(device_name)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     #model = resnet.build_model(config).to(device)
     model = stn.build_model(config).to(device)
     #Trainer object
