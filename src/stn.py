@@ -21,14 +21,18 @@ class STN(nn.Module):
             nn.MaxPool2d(2, stride=2),
             nn.ReLU(True),     
              #layer 1 64
-            nn.Conv2d(256, 512, kernel_size=5),
+            nn.Conv2d(256, 512, kernel_size=3),
             nn.BatchNorm2d(512),
             nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),     
+            
+            nn.Conv2d(512, 1024, kernel_size=2),
+            nn.BatchNorm2d(1024),
             nn.ReLU(True),     
             )
 
         self.fc_loc = nn.Sequential(
-                                    nn.Linear( 512*5*5, 512),
+                                    nn.Linear( 1024*5*5, 512),
                                     nn.ReLU(True),
                                     nn.Linear(512 , 2*3)
                                     )
@@ -41,7 +45,7 @@ class STN(nn.Module):
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        xs = xs.view(-1,  512*5*5)  
+        xs = xs.view(-1,  1024*5*5)  
         # xs = F.normalize(xs, dim=-1)
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
