@@ -24,8 +24,7 @@
         "BATCH_SIZE":64,
         "CHANNELS":3,
         "LAYERS": [3, 4, 23, 3],
-        "SAVE_MODEL_PATH": "./celeba/stnmodelv13.pth",
+        "SAVE_MODEL_PATH": "./celeba/stnmodelv14.pth",
         "AUTO_SAVE":true
     }
-    
 }

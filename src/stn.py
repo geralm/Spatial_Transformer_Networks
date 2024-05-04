@@ -10,29 +10,29 @@ class STN(nn.Module):
         in_dim = channels
         self._imsize = img_size
         self.fc2 = nn.Linear(3*self._imsize*self._imsize, 2)
+        conv_dim = 128
         self.localization = nn.Sequential(
-            nn.Conv2d(in_dim, 128, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(in_dim, conv_dim, kernel_size=11, stride=2, padding=3),
+            nn.BatchNorm2d(conv_dim),
             nn.MaxPool2d(2, stride=2),
             nn.ReLU(True),
             #layer 1 64
-            nn.Conv2d(128, 256, kernel_size=5),
-            nn.BatchNorm2d(256),
-            nn.MaxPool2d(2, stride=2),
+            nn.Conv2d(conv_dim, conv_dim*2, kernel_size=7),
+            nn.BatchNorm2d(conv_dim*2),
             nn.ReLU(True),     
              #layer 1 64
-            nn.Conv2d(256, 512, kernel_size=3),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(conv_dim*2, conv_dim*4, kernel_size=3 ),
+            nn.BatchNorm2d(conv_dim*4),
+            nn.ReLU(True),      
+
+            nn.Conv2d(conv_dim*4, conv_dim*4, kernel_size=2),
+            nn.BatchNorm2d(conv_dim*4),
             nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),     
-            
-            nn.Conv2d(512, 1024, kernel_size=2),
-            nn.BatchNorm2d(1024),
-            nn.ReLU(True),     
+            nn.ReLU(True),      
             )
 
         self.fc_loc = nn.Sequential(
-                                    nn.Linear( 1024*5*5, 512),
+                                    nn.Linear(512*11*11, 512),
                                     nn.ReLU(True),
                                     nn.Linear(512 , 2*3)
                                     )
@@ -45,7 +45,7 @@ class STN(nn.Module):
     # Spatial transformer network forward function
     def stn(self, x):
         xs = self.localization(x)
-        xs = xs.view(-1,  1024*5*5)  
+        xs = xs.view(-1,  512*11*11)  
         # xs = F.normalize(xs, dim=-1)
         theta = self.fc_loc(xs)
         theta = theta.view(-1, 2, 3) # Theta size [N x 2 x 3] 
