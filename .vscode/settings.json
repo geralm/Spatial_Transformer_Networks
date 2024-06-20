@@ -1,0 +1,4 @@
+{
+    "editor.defaultFormatter": "KevinRose.vsc-python-indent",
+    "editor.formatOnPaste": true
+}
